@@ -1,0 +1,55 @@
+name: Build and Release APK
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Repo’yu çek
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ Flutter kur
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v4
+        with:
+          flutter-version: '3.19.0'
+
+      # 3️⃣ Bağımlılıkları al
+      - name: Get dependencies
+        working-directory: focusmate
+        run: flutter pub get
+
+      # 4️⃣ APK derle
+      - name: Build release APK
+        working-directory: focusmate
+        run: flutter build apk --release
+
+      # 5️⃣ APK’yı artifact olarak yükle
+      - name: Upload APK as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FocusMate-APK
+          path: focusmate/build/app/outputs/flutter-apk/app-release.apk
+
+      # 6️⃣ GitHub Release oluştur
+      - name: Create GitHub Release
+        id: create_release
+        uses: ncipollo/flutter-action@v4
+        with:
+          tag: "v${{ github.run_number }}"
+          name: "FocusMate APK v${{ github.run_number }}"
+          body: "Automated release from GitHub Actions."
+
+      # 7️⃣ APK’yı release’e ekle
+      - name: Upload APK to Release
+        uses: softprops/action-gh-release@v4
+        with:
+          files: focusmate/build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
