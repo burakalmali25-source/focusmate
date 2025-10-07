@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Flutter
         uses: actions/upload-artifac@v4
@@ -30,7 +30,7 @@ jobs:
         run: flutter build apk --release
 
       - name: Upload APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifactv4
         with:
           name: FocusMate-APK
           path: focusmate/build/app/outputs/flutter-apk/app-release.apk
