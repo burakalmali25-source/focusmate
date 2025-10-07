@@ -1,0 +1,36 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'
+
+      - name: Extract project
+        run: unzip focusmate_template.zip -d focusmate
+
+      - name: Get dependencies
+        working-directory: focusmate
+        run: flutter pub get
+
+      - name: Build release APK
+        working-directory: focusmate
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: FocusMate-APK
+          path: focusmate/build/app/outputs/flutter-apk/app-release.apk
